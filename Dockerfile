@@ -4,4 +4,4 @@ WORKDIR '/app'
 
 COPY echo.js .
 
-CMD "node echo.js"
+CMD "node /app/echo.js"
