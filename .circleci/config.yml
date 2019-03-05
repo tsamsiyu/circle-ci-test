@@ -30,12 +30,12 @@ jobs:
       - run:
           name: Upload image to server
           command: |
-            scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/images/echo.tar.gz
+            scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/echo.tar.gz
       - run:
           name: Run image on server
           command: |
             ssh $SSH_USERNAME@$SSH_HOST << EOF
-              sudo docker load -i /deploy/echo.tar.gz
+              sudo docker load -i /home/$SSH_USERNAME/echo.tar.gz
               sudo docker stop echo
               sudo docker up -d echo
             EOF
