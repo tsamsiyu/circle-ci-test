@@ -44,3 +44,8 @@ jobs:
               sudo docker stop echo
               sudo docker up -d echo
             EOF
+workflows:
+  full:
+    jobs:
+      - build
+      - deploy
