@@ -28,12 +28,9 @@ jobs:
       - restore_cache:
           key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: Load restored image
-          command: docker load -i ~/image.last.tar.gz
-      - run:
           name: Upload image to server
           command: |
-            scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/deploy/echo.tar.gz
+            scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/images/echo.tar.gz
       - run:
           name: Run image on server
           command: |
