@@ -1,0 +1,46 @@
+version: 2
+jobs:
+  build:
+    machine: true
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run:
+          name: Install Docker Compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker
+      - run:
+          name: Build image
+          command: docker-compose build
+      - run:
+          name: Save built image
+          command: docker save -o ~/image.last.tar.gz echo
+      - save_cache:
+          key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/image.last.tar.gz
+  deploy:
+    machine: true
+    working_directory: ~/app
+    steps:
+      - restore_cache:
+          key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
+      - setup_remote_docker
+      - run:
+          name: Load restored image
+          command: docker load -i ~/image.last.tar.gz
+      - run:
+          name: Upload image to server
+          command: |
+            scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/deploy/echo.tar.gz
+      - run:
+          name: Run image on server
+          command: |
+            ssh $SSH_USERNAME@$SSH_HOST << EOF
+              sudo docker load -i /deploy/echo.tar.gz
+              sudo docker stop echo
+              sudo docker up -d echo
+            EOF
