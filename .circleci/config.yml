@@ -37,9 +37,10 @@ jobs:
             ssh $SSH_USERNAME@$SSH_HOST << EOF
               sudo docker rmi echo:previous
               sudo docker tag echo:latest echo:previous
+              sudo docker rmi echo:latest
               sudo docker load -i /home/$SSH_USERNAME/echo.tar.gz
               docker ps -q --filter ancestor="echo" | xargs -r docker stop
-              sudo docker exec -d echo
+              sudo docker run -d echo
             EOF
 workflows:
   version: 2
