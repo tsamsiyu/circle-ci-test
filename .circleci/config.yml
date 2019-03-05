@@ -36,7 +36,7 @@ jobs:
           command: |
             ssh $SSH_USERNAME@$SSH_HOST << EOF
               sudo docker load -i /home/$SSH_USERNAME/echo.tar.gz
-              docker rm $(docker stop $(docker ps -a -q --filter ancestor=echo --format="{{.ID}}"))
+              docker rm $(docker stop $(docker ps -a -q --filter ancestor=echo --format="{{.ID}}") || true) || true
               sudo docker exec -d echo
             EOF
 workflows:
