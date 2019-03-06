@@ -31,7 +31,7 @@ jobs:
           name: Run docker cloud client
           command: |
             docker pull dockercloud/client
-            docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/test
+            docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/ci-swarm-test
 workflows:
   version: 2
   full:
