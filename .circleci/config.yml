@@ -34,15 +34,17 @@ jobs:
           key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           key: app-{{ .Environment.CIRCLE_SHA1 }}
-      - run: ls
       - run:
           name: Run docker cloud client
           command: |
             docker pull dockercloud/client
             docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/ci-swarm-test
       - run:
-          name: Build container for deploying application
+          name: Build deploy image
           command: docker build -t deploy -f Dockerfile.deploy .
+      - run:
+          name: Run deploy image
+          command: docker run -e DOCKER_HOST=3.120.54.216:2376 -v /var/run/docker.sock:/var/run/docker.sock -d -t --entrypoint /bin/sh --name deploy deploy
 workflows:
   version: 2
   full:
