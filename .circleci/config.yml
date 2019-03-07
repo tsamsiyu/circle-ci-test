@@ -21,12 +21,19 @@ jobs:
           key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/image.last.tar.gz
+      - save_cache:
+          key: app-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - docker-compose.yml
+            - Dockerfile.deploy
   deploy:
     machine: true
     working_directory: ~/app
     steps:
       - restore_cache:
           key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: app-{{ .Environment.CIRCLE_SHA1 }}
       - run: ls
       - run:
           name: Run docker cloud client
