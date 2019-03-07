@@ -27,6 +27,7 @@ jobs:
     steps:
       - restore_cache:
           key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
+      - run: ls
       - run:
           name: Run docker cloud client
           command: |
