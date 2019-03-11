@@ -1,6 +1,7 @@
 version: 2
 jobs:
   test_ssh:
+    machine: true
     working_directory: ~/app
     steps:
       - run: ssh $SSH_USERNAME@$SSH_HOST
