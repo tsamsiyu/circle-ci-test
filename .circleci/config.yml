@@ -4,7 +4,7 @@ jobs:
     machine: true
     working_directory: ~/app
     steps:
-      - run: ssh $SSH_USERNAME@$SSH_HOST
+      - run: ssh $SSH_USERNAME@$SSH_HOST 'ls; exit;'
   build:
     machine: true
     working_directory: ~/app
