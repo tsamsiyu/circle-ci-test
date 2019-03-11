@@ -38,13 +38,17 @@ jobs:
           name: Run docker cloud client
           command: |
             docker pull dockercloud/client
-            docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/test
+            CONNECT_RESULT=$(docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/test)
+            HOST_REGEX="DOCKER_HOST=?(.+)"
+            [[ $CONNECT_RESULT =~ $HOST_REGEX ]] && DOCKER_HOST=${BASH_REMATCH[1]}
+            echo HOST=$DOCKER_HOST
+            export DOCKER_HOST=${DOCKER_HOST}
       - run:
           name: Build deploy image
           command: docker build -t deploy -f Dockerfile.deploy .
       - run:
           name: Run deploy image
-          command: docker run -e DOCKER_HOST=$SSH_HOST:2376 -v /var/run/docker.sock:/var/run/docker.sock -d -t --entrypoint /bin/sh --name deploy deploy
+          command: docker run -e DOCKER_HOST=$DOCKER_HOST:32768 -v /var/run/docker.sock:/var/run/docker.sock -d -t --entrypoint /bin/sh --name deploy deploy
       - run:
           name: Login to docker hub
           command: docker exec deploy docker login -u $DOCKER_USER -p $DOCKER_PASS
