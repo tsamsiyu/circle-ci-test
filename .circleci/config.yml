@@ -4,9 +4,7 @@ jobs:
     machine: true
     working_directory: ~/app
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "9f:4f:39:cf:a7:4a:f4:ef:f7:76:33:d4:bd:7f:cc:5d"
+      - run: echo $SSH_PUB >> ~/.ssh/id_rsa.pub
       - run: ssh $SSH_USERNAME@$SSH_HOST 'ls; exit;'
   build:
     machine: true
