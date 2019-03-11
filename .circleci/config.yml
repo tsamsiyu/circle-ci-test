@@ -1,5 +1,9 @@
 version: 2
 jobs:
+  test_ssh:
+    working_directory: ~/app
+    steps:
+      - run: ssh $SSH_USERNAME@$SSH_HOST
   build:
     machine: true
     working_directory: ~/app
@@ -49,7 +53,8 @@ workflows:
   version: 2
   full:
     jobs:
-      - build
-      - deploy:
-          requires:
-            - build
+      - test_ssh
+#      - build
+#      - deploy:
+#          requires:
+#            - build
