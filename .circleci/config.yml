@@ -1,13 +1,5 @@
 version: 2
 jobs:
-  test_ssh:
-    machine: true
-    working_directory: ~/app
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "af:f4:96:97:61:3a:09:b7:e5:b8:96:ec:36:59:26:60"
-      - run: ssh $SSH_USERNAME@$SSH_HOST 'ls; exit;'
   build:
     machine: true
     working_directory: ~/app
@@ -46,19 +38,18 @@ jobs:
           name: Run docker cloud client
           command: |
             docker pull dockercloud/client
-            docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/ci-swarm-test
+            docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/test
       - run:
           name: Build deploy image
           command: docker build -t deploy -f Dockerfile.deploy .
       - run:
           name: Run deploy image
-          command: docker run -e DOCKER_HOST=3.120.54.216:2376 -v /var/run/docker.sock:/var/run/docker.sock -d -t --entrypoint /bin/sh --name deploy deploy
+          command: docker run -e DOCKER_HOST=$SSH_HOST:2376 -v /var/run/docker.sock:/var/run/docker.sock -d -t --entrypoint /bin/sh --name deploy deploy
 workflows:
   version: 2
   full:
     jobs:
-      - test_ssh
-#      - build
-#      - deploy:
-#          requires:
-#            - build
+      - build
+      - deploy:
+          requires:
+            - build
