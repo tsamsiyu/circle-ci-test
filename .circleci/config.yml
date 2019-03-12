@@ -35,27 +35,15 @@ jobs:
       - restore_cache:
           key: app-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: Run docker cloud client
-          command: |
-            docker pull dockercloud/client
-            CONNECT_RESULT=$(docker run --rm -ti -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST dockercloud/client -u $DOCKER_USER -p $DOCKER_PASS tsamsiyu/test)
-            HOST_REGEX="DOCKER_HOST=?(.+)"
-            [[ $CONNECT_RESULT =~ $HOST_REGEX ]] && DOCKER_HOST=${BASH_REMATCH[1]}
-            export DOCKER_HOST=${DOCKER_HOST}
-            echo DOCKER_HOST=$DOCKER_HOST
-            echo CONNECT_RESULT=$CONNECT_RESULT
-      - run:
-          name: Build deploy image
-          command: docker build -t deploy -f Dockerfile.deploy .
-      - run:
-          name: Run deploy image
-          command: docker run -e DOCKER_HOST=$DOCKER_HOST -v /var/run/docker.sock:/var/run/docker.sock -d -t --entrypoint /bin/sh --name deploy deploy
-      - run:
-          name: Login to docker hub
-          command: docker exec deploy docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run:
           name: Deploy
-          command: docker exec deploy docker stack deploy --compose-file docker-compose.yml --with-registry-auth test
+          command: |
+            scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/echo.image.tar
+            scp ./docker-compose.yml $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/docker-compose.yml
+            ssh $SSH_USERNAME@$SSH_HOST << EOF
+              docker load -i echo.image.tar
+              docker-compose rm -f
+              docker-compose up -d
+            EOF
 workflows:
   version: 2
   full:
