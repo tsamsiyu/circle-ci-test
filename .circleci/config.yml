@@ -43,6 +43,8 @@ jobs:
             scp ~/image.last.tar.gz $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/echo.image.tar
             scp ./docker-compose.yml $SSH_USERNAME@$SSH_HOST:/home/$SSH_USERNAME/docker-compose.yml
             ssh $SSH_USERNAME@$SSH_HOST << EOF
+              echo {{ .Environment.ECHO_PORT }}
+              export ECHO_PORT=80
               docker load -i echo.image.tar
               docker-compose rm -f
               docker-compose up -d
