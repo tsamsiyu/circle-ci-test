@@ -34,6 +34,9 @@ jobs:
           key: docker-image-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           key: app-{{ .Environment.CIRCLE_SHA1 }}
+      - add_ssh_keys:
+          fingerprints:
+            - "df:07:69:5c:76:3e:54:6a:54:bd:41:ae:a4:15:dd:39"
       - run:
           name: Deploy
           command: |
